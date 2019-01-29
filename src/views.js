@@ -1,22 +1,12 @@
-'use strict'
+import { getTodos, removeTodo, saveTodos } from "./todos";
+import { getFilters } from "./filters";
 
-// Fetch existing todos from localStorage
-const getSavedTodos = () => {
-    const todosJSON = localStorage.getItem("todos");
-    try {
-        return todosJSON ? JSON.parse(todosJSON) : [];
-    } catch (e) {
-        return [];
-    }
-}
-
-// Save todos to localStorage
-const saveTodos = (todos) => {
-    localStorage.setItem("todos", JSON.stringify(todos));
-}
-
-//Render application todos based on filters
-const renderTodos = (todos, filters) => {
+// renderTodos
+// Arguments: none
+// Return value: none
+const renderTodos = () => {
+    const todos = getTodos();
+    const filters = getFilters();
     const todoEl = document.querySelector("#todo-container");
 
     const filteredTodos = todos.filter( (todo) => {
@@ -44,17 +34,9 @@ const renderTodos = (todos, filters) => {
     }
 }
 
-//Remove todo
-const removeTodo = (id) => {
-    const todoIndex = todos.findIndex(function(todo){
-        return todo.id===id;
-    })
-    if(todoIndex>=0) {
-        todos.splice(todoIndex, 1);
-    }
-}
-
-//Get the DOM elements for an individual todo
+// generateTodoDOM
+// Arguments: todo
+// Return value: the todo element
 const generateTodoDOM = (todo) => {
     const containerEl = document.createElement('div'); 
     const todoEl = document.createElement('label');
@@ -74,8 +56,8 @@ const generateTodoDOM = (todo) => {
         } else {
             todo.completed = false;
         }
-        saveTodos(todos);
-        renderTodos(todos, filters);
+        saveTodos();
+        renderTodos();
     })
 
     // Setup the todo text
@@ -93,14 +75,16 @@ const generateTodoDOM = (todo) => {
     todoEl.appendChild(removeButton);
     removeButton.addEventListener("click", () => {
         removeTodo(todo.id);
-        saveTodos(todos);
-        renderTodos(todos, filters);
+        saveTodos();
+        renderTodos();
     })
 
     return todoEl;
 }
 
-//Get the DOM elements for list summary
+// generateSummaryDOM
+// Arguments: incompletedTodos
+// Return value: the summary element
 const generateSummaryDOM = (incompletedTodos) => {   
     const summary = document.createElement("h2");
     summary.classList.add("list-title");
@@ -108,3 +92,6 @@ const generateSummaryDOM = (incompletedTodos) => {
     summary.textContent = `You have ${incompletedTodos.length} todo${plural} left`;
     return summary;
 }
+
+// Make sure to set up the exports
+export {renderTodos, generateTodoDOM, generateSummaryDOM}
